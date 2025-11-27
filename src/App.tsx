@@ -1,31 +1,33 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './components/auth/AuthProvider'
-import { ProtectedRoute } from './components/auth/ProtectedRoute'
-import { Home } from './pages/Home'
-import { Login } from './pages/Login'
-import { Signup } from './pages/Signup'
-import { Dashboard } from './pages/Dashboard'
+import { MusicScanner } from './components/MusicScanner'
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<div className="p-8 text-center"><h1>404 - Page not found</h1></div>} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🎼</span>
+              <span className="text-xl font-bold text-gray-900">MusicScanner</span>
+            </div>
+            <div className="text-sm text-gray-600">
+              Digital Music Processing & Playback
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <MusicScanner />
+      </main>
+
+      {/* Footer */}
+      <footer className="mt-8 pb-8 text-center text-sm text-gray-600">
+        <p>🎵 Full-featured music import, export, and playback system</p>
+      </footer>
+    </div>
   )
 }
 
