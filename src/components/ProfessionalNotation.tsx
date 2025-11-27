@@ -80,25 +80,21 @@ export function ProfessionalNotation({
 
     // Calculate width based on number of notes
     const notesCount = songData.melody.length
-    const width = Math.max(800, notesCount * 100)
-    const height = 300
+    const width = Math.max(900, notesCount * 80)
+    const height = 250
 
     try {
-      // Create renderer
-      const renderer = new Renderer(containerRef.current, Renderer.Backends.SVG)
+      // Create renderer with SVG backend
+      const div = containerRef.current
+      const renderer = new Renderer(div, Renderer.Backends.SVG)
       renderer.resize(width, height)
-      rendererRef.current = renderer
-
       const context = renderer.getContext()
-      context.setFont('Arial', 10)
 
-      // Create main stave
-      const stave = new Stave(10, 40, width - 20)
+      // Create stave
+      const stave = new Stave(10, 50, width - 30)
+      stave.addClef('treble').addTimeSignature('4/4')
 
-      // Add clef, time signature, and key signature
-      stave.addClef('treble')
-      stave.addTimeSignature('4/4')
-
+      // Add key signature if not C Major
       const keySignature = getKeySignature(keyTransposition)
       if (keySignature !== 'C') {
         stave.addKeySignature(keySignature)
@@ -107,71 +103,88 @@ export function ProfessionalNotation({
       stave.setContext(context).draw()
 
       // Convert melody to VexFlow notes
-      const notes: any[] = []
-      songData.melody.forEach((note, index) => {
-        const { keys, duration } = convertNoteToVexFlow(note.note, note.duration)
+      const vexFlowNotes: any[] = []
 
-        const staveNote = new StaveNote({
-          keys,
-          duration,
-          clef: 'treble'
-        })
+      songData.melody.forEach((melodyNote) => {
+        try {
+          const { keys, duration } = convertNoteToVexFlow(melodyNote.note, melodyNote.duration)
 
-        // Add accidentals if needed
-        const noteMatch = note.note.match(/([A-G])(#|b)?/)
-        if (noteMatch && noteMatch[2]) {
-          const accidentalType = noteMatch[2] === '#' ? '#' : 'b'
-          staveNote.addModifier(new Accidental(accidentalType), 0)
-        }
+          const staveNote = new StaveNote({
+            keys: keys,
+            duration: duration,
+            clef: 'treble',
+            autoStem: true
+          })
 
-        notes.push(staveNote)
-      })
-
-      setVexNotes(notes)
-
-      // Create beams for eighth notes
-      const beamGroups: any[] = []
-      let currentBeam: any[] = []
-
-      notes.forEach((note, index) => {
-        if (note.duration === '8') {
-          currentBeam.push(note)
-        } else {
-          if (currentBeam.length >= 2) {
-            beamGroups.push(new Beam(currentBeam))
+          // Add accidentals
+          const noteMatch = melodyNote.note.match(/([A-G])(#|b)?/)
+          if (noteMatch && noteMatch[2]) {
+            staveNote.addModifier(new Accidental(noteMatch[2]), 0)
           }
-          currentBeam = []
+
+          vexFlowNotes.push(staveNote)
+        } catch (err) {
+          console.error('Error creating note:', melodyNote, err)
         }
       })
 
-      // Handle last beam group
-      if (currentBeam.length >= 2) {
-        beamGroups.push(new Beam(currentBeam))
+      if (vexFlowNotes.length === 0) {
+        throw new Error('No valid notes to display')
       }
 
-      // Create voice and format
+      setVexNotes(vexFlowNotes)
+
+      // Create beams for consecutive eighth notes
+      const beams: any[] = []
+      let beamGroup: any[] = []
+
+      vexFlowNotes.forEach((note) => {
+        if (note.getDuration() === '8') {
+          beamGroup.push(note)
+        } else {
+          if (beamGroup.length >= 2) {
+            beams.push(new Beam(beamGroup))
+          }
+          beamGroup = []
+        }
+      })
+
+      if (beamGroup.length >= 2) {
+        beams.push(new Beam(beamGroup))
+      }
+
+      // Create voice and add notes
       const voice = new Voice({
-        numBeats: Math.ceil(notes.length / 4) * 4,
+        numBeats: 4,
         beatValue: 4
       })
-      voice.addTickables(notes)
+      voice.setStrict(false) // Allow flexible timing
+      voice.addTickables(vexFlowNotes)
 
       // Format and draw
-      const formatter = new Formatter()
-      formatter.joinVoices([voice]).format([voice], width - 100)
+      new Formatter()
+        .joinVoices([voice])
+        .format([voice], width - 60)
 
-      // Draw notes
       voice.draw(context, stave)
 
       // Draw beams
-      beamGroups.forEach(beam => beam.setContext(context).draw())
-
-      // Add title
-      context.setFont('Arial', 16, 'bold')
-      context.fillText(songData.title, width / 2 - 100, 25)
+      beams.forEach(beam => {
+        beam.setContext(context).draw()
+      })
 
     } catch (error) {
       console.error('VexFlow rendering error:', error)
+      // Show error in the container
+      if (containerRef.current) {
+        containerRef.current.innerHTML = `
+          <div style="padding: 20px; text-align: center; color: #ef4444;">
+            <p><strong>Unable to render notation</strong></p>
+            <p style="font-size: 14px;">${error}</p>
+            <p style="font-size: 12px; margin-top: 10px;">Try switching to Simple View</p>
+          </div>
+        `
+      }
     }
 
     return () => {
