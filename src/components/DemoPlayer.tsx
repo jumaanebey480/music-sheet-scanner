@@ -3,7 +3,6 @@ import * as Tone from 'tone'
 import { saveAs } from 'file-saver'
 import MidiWriter from 'midi-writer-js'
 import { SimpleNotation } from './SimpleNotation'
-import { ProfessionalNotation } from './ProfessionalNotation'
 import MidiParser from '../lib/audio/midi-parser'
 
 interface DemoPlayerProps {
@@ -42,7 +41,6 @@ export function DemoPlayer({ uploadedSong }: DemoPlayerProps = {}) {
   const [metronomeClick, setMetronomeClick] = useState<Tone.Synth | null>(null)
   const [importedSongs, setImportedSongs] = useState<{ [key: string]: { title: string; melody: any[] } }>({})
   const [isImporting, setIsImporting] = useState(false)
-  const [notationStyle, setNotationStyle] = useState<'professional' | 'simple'>('professional')
 
   // Helper to check if choir mode is active
   const isChoirMode = selectedInstrument === 'choir' && selectedSong === 'saints'
@@ -761,50 +759,15 @@ export function DemoPlayer({ uploadedSong }: DemoPlayerProps = {}) {
 
   return (
     <div className="space-y-6">
-      {/* Notation Style Toggle */}
-      <div className="flex items-center justify-center space-x-2">
-        <button
-          onClick={() => setNotationStyle('professional')}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            notationStyle === 'professional'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          🎼 Professional View
-        </button>
-        <button
-          onClick={() => setNotationStyle('simple')}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-            notationStyle === 'simple'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          📝 Simple View
-        </button>
-      </div>
-
-      {/* Notation Display */}
-      {notationStyle === 'professional' ? (
-        <ProfessionalNotation
-          isPlaying={isPlaying}
-          currentTime={currentTime}
-          tempo={tempo}
-          selectedSong={selectedSong}
-          keyTransposition={keyTransposition}
-          songData={songs[selectedSong as keyof typeof songs]}
-        />
-      ) : (
-        <SimpleNotation
-          isPlaying={isPlaying}
-          currentTime={currentTime}
-          tempo={tempo}
-          selectedSong={selectedSong}
-          keyTransposition={keyTransposition}
-          songData={songs[selectedSong as keyof typeof songs]}
-        />
-      )}
+      {/* Professional Notation Display */}
+      <SimpleNotation
+        isPlaying={isPlaying}
+        currentTime={currentTime}
+        tempo={tempo}
+        selectedSong={selectedSong}
+        keyTransposition={keyTransposition}
+        songData={songs[selectedSong as keyof typeof songs]}
+      />
 
       {/* Audio Controls */}
       <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-blue-100">

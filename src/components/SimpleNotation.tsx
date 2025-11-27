@@ -240,19 +240,21 @@ export function SimpleNotation({ isPlaying, currentTime, tempo, selectedSong, ke
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200">
+    <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-gray-200">
       <div className="text-center mb-4">
-        <h4 className="text-lg font-semibold text-gray-800">🎼 Musical Notation</h4>
-        <p className="text-sm text-gray-600">Watch the notes highlight as they play</p>
+        <h4 className="text-xl font-bold text-gray-900 mb-1">🎼 Professional Sheet Music</h4>
+        <p className="text-sm text-gray-600">High-quality music notation with real-time playback</p>
         {keyTransposition !== 0 && (
-          <p className="text-xs text-blue-600 mt-1">
-            Key: {keySignature.name} ({keySignature.sharps.length > 0 ? `${keySignature.sharps.length} sharps` : `${keySignature.flats.length} flats`})
-          </p>
+          <div className="mt-2 inline-block px-3 py-1 bg-blue-50 rounded-full">
+            <p className="text-xs text-blue-700 font-medium">
+              Key: {keySignature.name} ({keySignature.sharps.length > 0 ? `${keySignature.sharps.length} sharp${keySignature.sharps.length !== 1 ? 's' : ''}` : `${keySignature.flats.length} flat${keySignature.flats.length !== 1 ? 's' : ''}`})
+            </p>
+          </div>
         )}
       </div>
 
       {/* Staff Lines */}
-      <div className="relative bg-white p-4 rounded border-2 border-gray-100">
+      <div className="relative bg-gradient-to-b from-gray-50 to-white p-6 rounded-lg border-2 border-gray-200 shadow-inner">
         <svg key={selectedSong} viewBox="0 0 800 200" className="w-full h-32">
           {/* Staff lines */}
           {[0, 1, 2, 3, 4].map(line => (
@@ -583,30 +585,47 @@ export function SimpleNotation({ isPlaying, currentTime, tempo, selectedSong, ke
         </svg>
 
         {/* Legend */}
-        <div className="flex justify-center space-x-6 mt-4 text-xs">
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
-            <span>Notes</span>
+        <div className="flex justify-center space-x-8 mt-6 text-sm">
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-gray-700 rounded-full border-2 border-gray-900"></div>
+            <span className="text-gray-700 font-medium">Notes</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <span>Playing Now</span>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-red-600"></div>
+            <span className="text-red-600 font-medium">Currently Playing</span>
           </div>
+          {isPlaying && (
+            <div className="flex items-center space-x-2">
+              <div className="w-1 h-4 bg-blue-500"></div>
+              <span className="text-blue-600 font-medium">Playback Position</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Song info */}
-      <div className="mt-4 text-center">
-        <div className="inline-flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full">
-          <span className="text-blue-600 font-medium text-sm">
+      <div className="mt-6 text-center">
+        <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-3 rounded-lg border border-blue-200">
+          <span className="text-blue-900 font-bold text-base">
             🎵 {songData.title}
           </span>
           {isPlaying && (
-            <span className="text-blue-500 text-xs">
-              Note {currentNoteIndex + 1} of {melody.length}
-            </span>
+            <>
+              <span className="text-blue-400">•</span>
+              <span className="text-blue-700 text-sm font-medium">
+                Note {currentNoteIndex + 1} / {melody.length}
+              </span>
+            </>
           )}
         </div>
+      </div>
+
+      {/* Professional Features Info */}
+      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+        <p className="text-xs text-blue-800 text-center leading-relaxed">
+          ✨ <strong>Professional Features:</strong> Real-time playback tracking • Key signature display •
+          Automatic beaming for eighth notes • Proper stem direction • Ledger lines • Time signature
+        </p>
       </div>
     </div>
   )
