@@ -112,9 +112,11 @@ export function ProfessionalNotation({
           const staveNote = new StaveNote({
             keys: keys,
             duration: duration,
-            clef: 'treble',
-            autoStem: true
+            clef: 'treble'
           })
+
+          // IMPORTANT: Set stave for proper rendering in VexFlow 5.0
+          staveNote.setStave(stave)
 
           // Add accidentals
           const noteMatch = melodyNote.note.match(/([A-G])(#|b)?/)
@@ -139,7 +141,8 @@ export function ProfessionalNotation({
       let beamGroup: any[] = []
 
       vexFlowNotes.forEach((note) => {
-        if (note.getDuration() === '8') {
+        const noteDuration = note.getDuration()
+        if (noteDuration === '8') {
           beamGroup.push(note)
         } else {
           if (beamGroup.length >= 2) {
@@ -161,11 +164,11 @@ export function ProfessionalNotation({
       voice.setStrict(false) // Allow flexible timing
       voice.addTickables(vexFlowNotes)
 
-      // Format and draw
-      new Formatter()
-        .joinVoices([voice])
-        .format([voice], width - 60)
+      // Format and draw - VexFlow 5.0 style
+      const formatter = new Formatter()
+      formatter.joinVoices([voice]).format([voice], width - 80)
 
+      // Draw the voice
       voice.draw(context, stave)
 
       // Draw beams

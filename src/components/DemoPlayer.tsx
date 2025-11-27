@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import * as Tone from 'tone'
 import { saveAs } from 'file-saver'
 import MidiWriter from 'midi-writer-js'
-import { SimpleNotation } from './SimpleNotation'
+import { ProfessionalNotation } from './ProfessionalNotation'
 import MidiParser from '../lib/audio/midi-parser'
 
 interface DemoPlayerProps {
@@ -760,7 +760,7 @@ export function DemoPlayer({ uploadedSong }: DemoPlayerProps = {}) {
   return (
     <div className="space-y-6">
       {/* Professional Notation Display */}
-      <SimpleNotation
+      <ProfessionalNotation
         isPlaying={isPlaying}
         currentTime={currentTime}
         tempo={tempo}
