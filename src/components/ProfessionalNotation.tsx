@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import Vex from 'vexflow'
-
-const { Renderer, Stave, StaveNote, Voice, Formatter, Beam, Accidental } = Vex.Flow
+import { Renderer, Stave, StaveNote, Voice, Formatter, Beam, Accidental } from 'vexflow'
 
 interface ProfessionalNotationProps {
   isPlaying: boolean
@@ -29,22 +27,18 @@ export function ProfessionalNotation({
   const [vexNotes, setVexNotes] = useState<any[]>([])
 
   // Get key signature information
-  const getKeySignature = (transposition: number) => {
-    const keySignatures: { [key: number]: string } = {
-      0: 'C',    // C Major
-      -5: 'Gb',  // G♭ Major (6 flats)
-      2: 'Db',   // D♭ Major (5 flats)
-      -9: 'Ab',  // A♭ Major (4 flats)
-      4: 'Eb',   // E♭ Major (3 flats)
-      -7: 'Bb',  // B♭ Major (2 flats)
-      -6: 'F',   // F Major (1 flat)
-      7: 'G',    // G Major (1 sharp)
-      -4: 'D',   // D Major (2 sharps)
-      9: 'A',    // A Major (3 sharps)
-      -2: 'E',   // E Major (4 sharps)
-      -11: 'B'   // B Major (5 sharps)
-    }
-    return keySignatures[transposition] || 'C'
+  const getKeySignature = (transposition: number): string => {
+    if (transposition === 0) return 'C'
+    if (transposition === -5 || transposition === 5) return 'Gb'
+    if (transposition === 2) return 'Db'
+    if (transposition === -9 || transposition === 9) return 'Ab'
+    if (transposition === 4) return 'Eb'
+    if (transposition === -7 || transposition === 7) return 'Bb'
+    if (transposition === -6 || transposition === 6) return 'F'
+    if (transposition === -4) return 'D'
+    if (transposition === -2) return 'E'
+    if (transposition === -11 || transposition === 11) return 'B'
+    return 'C'
   }
 
   // Convert Tone.js duration to VexFlow duration
@@ -157,8 +151,8 @@ export function ProfessionalNotation({
 
       // Create voice and format
       const voice = new Voice({
-        num_beats: Math.ceil(notes.length / 4) * 4,
-        beat_value: 4
+        numBeats: Math.ceil(notes.length / 4) * 4,
+        beatValue: 4
       })
       voice.addTickables(notes)
 
